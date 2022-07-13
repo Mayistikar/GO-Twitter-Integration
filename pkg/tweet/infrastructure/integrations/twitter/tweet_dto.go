@@ -2,13 +2,7 @@ package twitter
 
 import (
 	"encoding/json"
-	"errors"
 	"portfolio/pkg/tweet/domain"
-)
-
-var (
-	ErrorTweetDTOInvalidID   = errors.New("invalid tweet id")
-	ErrorTweetDTOInvalidText = errors.New("invalid text id")
 )
 
 type MetaDTOResponse struct {
@@ -17,9 +11,10 @@ type MetaDTOResponse struct {
 	NewestID    string `json:"newest_id,omitempty"`
 	OldestID    string `json:"oldest_id,omitempty"`
 }
+
 type TweetDTOResponse struct {
-	Data []TweetDTO
-	Meta MetaDTOResponse
+	Data []TweetDTO      `json:"data,omitempty"`
+	Meta MetaDTOResponse `json:"meta"`
 }
 
 type TweetDTO struct {
