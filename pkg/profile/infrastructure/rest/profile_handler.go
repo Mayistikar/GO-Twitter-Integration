@@ -15,15 +15,15 @@ func NewProfileHandler(profileApplication *application.ProfileApplication) *Prof
 }
 
 func (p *ProfileHandler) GetProfile(ctx *gin.Context) {
-	var profileDTO ProfileDTO
-	if err := ctx.ShouldBindUri(&profileDTO); err != nil {
+	var profileRequestDTO RequestDTO
+	if err := ctx.ShouldBindUri(&profileRequestDTO); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	profile, err := p.profileApplication.GetProfile(profileDTO.UUID)
+	profile, err := p.profileApplication.GetProfile(profileRequestDTO.UUID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -31,7 +31,8 @@ func (p *ProfileHandler) GetProfile(ctx *gin.Context) {
 		return
 	}
 
-	err = profileDTO.mapProfile(profile)
+	var profileResponseDTO ResponseDTO
+	err = profileResponseDTO.mapProfile(profile)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -39,19 +40,19 @@ func (p *ProfileHandler) GetProfile(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, profileDTO)
+	ctx.JSON(http.StatusOK, profileResponseDTO)
 }
 
 func (p *ProfileHandler) CreateProfile(ctx *gin.Context) {
-	var profileDTO ProfileDTO
-	if err := ctx.ShouldBind(&profileDTO); err != nil {
+	var profileRequestDTO RequestDTO
+	if err := ctx.ShouldBind(&profileRequestDTO); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	profile, err := profileDTO.toProfile()
+	profile, err := profileRequestDTO.toProfile()
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
@@ -67,33 +68,33 @@ func (p *ProfileHandler) CreateProfile(ctx *gin.Context) {
 		return
 	}
 
-	var newProfileDTO ProfileDTO
-	if err := newProfileDTO.mapProfile(*newProfile); err != nil {
+	var profileResponseDTO ResponseDTO
+	if err := profileResponseDTO.mapProfile(*newProfile); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
-	ctx.JSON(http.StatusCreated, newProfileDTO)
+	ctx.JSON(http.StatusCreated, profileResponseDTO)
 }
 
 func (p *ProfileHandler) UpdateProfile(ctx *gin.Context) {
-	var profileDTO ProfileDTO
-	if err := ctx.ShouldBindUri(&profileDTO); err != nil {
+	var profileRequestDTO RequestDTO
+	if err := ctx.ShouldBindUri(&profileRequestDTO); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	if err := ctx.ShouldBindJSON(&profileDTO); err != nil {
+	if err := ctx.ShouldBindJSON(&profileRequestDTO); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	profile, err := profileDTO.toProfile()
+	profile, err := profileRequestDTO.toProfile()
 	if err != nil {
 		ctx.JSON(http.StatusNotModified, gin.H{
 			"error": err.Error(),
@@ -109,14 +110,13 @@ func (p *ProfileHandler) UpdateProfile(ctx *gin.Context) {
 		return
 	}
 
-	var updatedProfileDTO ProfileDTO
-	if err := updatedProfileDTO.mapProfile(*updatedProfile); err != nil {
+	var profileResponseDTO ResponseDTO
+	if err := profileResponseDTO.mapProfile(*updatedProfile); err != nil {
 		ctx.JSON(http.StatusNotModified, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, updatedProfileDTO)
-
+	ctx.JSON(http.StatusOK, profileResponseDTO)
 }

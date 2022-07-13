@@ -34,5 +34,9 @@ func (h *TweetHandler) GetTweet(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSONP(http.StatusOK, tweets)
+	dtoTweets := ToDTOResponse(tweets...)
+
+	ctx.JSONP(http.StatusOK, gin.H{
+		"data": dtoTweets,
+	})
 }
